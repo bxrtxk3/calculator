@@ -1,0 +1,518 @@
+<form id="calculator" action="">
+  Rodzaj spadu dachu:<br />
+  <input
+    type="radio"
+    name="roof-pitch"
+    id="jednospadowy"
+    value="jednospadowy"
+    checked
+  />
+  <label for="jednospadowy">Jednospadowy</label><br />
+  <input type="radio" name="roof-pitch" id="dwuspadowy" value="dwuspadowy" />
+  <label for="dwuspadowy">Dwuspadowy</label><br /><br />
+
+  Rodzaj garażu:<br />
+  <input
+    type="radio"
+    name="garage-type"
+    id="ocynkowany"
+    value="ocynkowany"
+    checked
+  />
+  <label for="ocynkowany">Ocynkowany</label><br />
+  <input type="radio" name="garage-type" id="akrylowy" value="akrylowy" />
+  <label for="akrylowy">Akrylowy</label><br />
+  <input
+    type="radio"
+    name="garage-type"
+    id="drewnopodobny"
+    value="drewnopodobny"
+  />
+  <label for="drewnopodobny">Drewnopodobny</label><br /><br />
+
+  <label for="width"
+    >Szerokość (cm):
+    <input
+      type="number"
+      name="width"
+      id="width"
+      value="300"
+      min="300"
+      max="5000" /></label
+  ><br />
+  <label for="lengthh"
+    >Długość (cm):
+    <input
+      type="number"
+      name="lengthh"
+      id="lengthh"
+      value="300"
+      min="300"
+      max="5000" /></label
+  ><br />
+  <div id="height-settings">
+    <label for="height-front"
+      >Wysokość - przód (cm):
+      <input
+        type="number"
+        name="height-front"
+        id="height-front"
+        value="213" /></label
+    ><br />
+    <label for="height-rear"
+      >Wysokość - tył (cm):
+      <input
+        type="number"
+        name="height-rear"
+        id="height-rear"
+        value="188" /></label
+    ><br />
+  </div>
+  <label for="height-gate"
+    >Wysokość wjazdu (cm):
+    <input
+      type="number"
+      name="height-gate"
+      id="height-gate"
+      value="200" /></label
+  ><br />
+  <label for="roof-type"
+    >Rodzaj dachu:
+    <select name="roof-type" id="roof-type">
+      <option value="standard">Standardowy (ocynkowany)</option>
+      <option value="steel-tile">Blachodachówka</option>
+    </select></label
+  ><br />
+  <label for="gate-type"
+    >Rodzaj bramy:
+    <select name="gate-type" id="gate-type">
+      <option value="dw-gate">Dwuskrzydłowa</option>
+      <option value="uao-gate">Uchylna</option>
+    </select></label
+  ><br />
+  <label for="embossment-type"
+    >Rodzaj przetłoczenia blachy:
+    <select name="embossment-type" id="embossment-type">
+      <option value="vertical">Pionowe</option>
+      <option value="horizontal">Poziome</option>
+    </select></label
+  ><br />
+  <label for="gate-quantity"
+    >Ilość bram:
+    <input
+      type="number"
+      name="gate-quantity"
+      id="gate-quantity"
+      value="1"
+      max="1"
+    /> </label
+  ><br /><input type="checkbox" name="flashing" id="flashing" />
+  <label for="flashing" id="flashing-description"
+    >Obróbka blacharska (okucia)</label
+  ><br /><input type="checkbox" name="additional-door" id="additional-door" />
+  <label for="additional-door"
+    >Dodatkowe drzwi wejściowe
+    <input
+      type="number"
+      name="additional-door-quantity"
+      id="additional-door-quantity"
+      value="1"
+      max="5"
+    />
+    szt.</label
+  ><br /><input type="checkbox" name="gutter" id="gutter" />
+  <label for="gutter">Rynna</label><br /><input
+    type="checkbox"
+    name="automatic-gate"
+    id="automatic-gate"
+  />
+  <label for="automatic-gate">Automat do bramy (tylko dla bram uchylnych)</label
+  ><br /><input
+    type="checkbox"
+    name="additional-window"
+    id="additional-window"
+  />
+  <label for="additional-window">Dodatkowy otwór okienny</label><br /><input
+    type="checkbox"
+    name="anti-condensation-felt"
+    id="anti-condensation-felt"
+  />
+  <label for="anti-condensation-felt">Filc antykondensacyjny</label><br />
+  <p id="totalPrice"></p>
+</form>
+<button id="snickers">Oblicz</button>
+
+<script>
+  document.forms["calculator"].addEventListener("click", () => getTotal());
+
+  document
+    .querySelector("#snickers")
+    .addEventListener("click", () => getTotal());
+
+  window.addEventListener("load", () => getTotal());
+
+  document
+    .querySelectorAll('input[type=radio][name="garage-type"]')
+    .forEach((radio) => radio.addEventListener("change", () => getTotal()));
+
+  document
+    .querySelectorAll('input[type=radio][name="roof-pitch"]')
+    .forEach((radio) =>
+      radio.addEventListener("change", () => {
+        if (
+          document.forms["calculator"].elements["roof-pitch"].value ==
+          "jednospadowy"
+        ) {
+          document.getElementById("height-settings").innerHTML =
+            '<label for="height-front">Wysokość - przód (cm): <input type="number" name="height-front" id="height-front" value="213" /></label><br /><label for="height-rear">Wysokość - tył (cm): <input type="number" name="height-rear" id="height-rear" value="188" /></label><br />';
+        } else {
+          if (
+            document.forms["calculator"].elements["embossment-type"].value ==
+            "horizontal"
+          ) {
+            var heightSidesValue = 218;
+          } else {
+            var heightSidesValue = 213;
+          }
+          document.getElementById("height-settings").innerHTML =
+            '<label for="height-middle">Wysokość - środek (cm): <input type="number" name="height-middle" id="height-middle" value="257" /></label><br /><label for="height-sides">Wysokość - boki (cm): <input type="number" name="height-sides" id="height-sides" value="' +
+            heightSidesValue +
+            '" /></label><br />';
+        }
+      })
+    );
+
+  document
+    .querySelector('input[type=number][name="width"]')
+    .addEventListener("change", () => {
+      var theForm = document.forms["calculator"];
+      var width = Math.ceil(theForm.elements["width"].value / 100);
+      document.getElementById("gate-quantity").max = Math.floor(width / 3);
+    });
+
+  function getTotal() {
+    var theForm = document.forms["calculator"];
+
+    var totalPrice = 0;
+    var garagePrice = 0;
+    var basePrice = 0;
+
+    var width = Math.ceil(theForm.elements["width"].value / 100);
+    var lengthh = Math.ceil(theForm.elements["lengthh"].value / 100);
+
+    var roofPitch = theForm.elements["roof-pitch"].value;
+    var heightGate = parseInt(theForm.elements["height-gate"].value);
+
+    var garageType = theForm.elements["garage-type"].value;
+    document.getElementById("roof-type").options[0].text =
+      "Standardowy (" + garageType + ")";
+
+    var roofType = theForm.elements["roof-type"].value;
+    var gateType = theForm.elements["gate-type"].value;
+    var gateQuantity = theForm.elements["gate-quantity"].value;
+
+    var embossmentType = theForm.elements["embossment-type"].value;
+
+    if (roofPitch == "jednospadowy") {
+      //JEDNOSPADOWY || JEDNOSPADOWY || JEDNOSPADOWY || JEDNOSPADOWY || JEDNOSPADOWY || JEDNOSPADOWY || JEDNOSPADOWY || JEDNOSPADOWY
+      var heightFront = parseInt(theForm.elements["height-front"].value);
+      var heightRear = parseInt(theForm.elements["height-rear"].value);
+
+      if (heightFront > 213 || heightRear > 188 || heightGate > 200) {
+        var addHeightPrice =
+          Math.max(
+            Math.ceil((heightFront - 213) / 10),
+            Math.ceil((heightRear - 188) / 10),
+            Math.ceil((heightGate - 200) / 10)
+          ) *
+          (width - 1) *
+          100;
+        totalPrice += addHeightPrice;
+      }
+      basePrice = 2400;
+      var addWidthPrice = 0;
+      var addLengthhPrice = 0;
+      var tmpNumber = 300;
+      for (
+        var tmpLengthh = 4;
+        tmpLengthh <= Math.max(lengthh, width);
+        tmpLengthh++
+      ) {
+        addLengthhPrice += tmpNumber;
+        if (tmpLengthh % 2 == 1) {
+          tmpNumber += 200;
+        }
+        if (Math.min(width, lengthh) == tmpLengthh) {
+          addWidthPrice = (width - 3) * 200 * (lengthh - 3);
+          basePrice += addLengthhPrice + 500;
+        }
+      }
+      if (width > lengthh) {
+        addWidthPrice = 200 * (width - 3) * (lengthh - 3);
+        if (lengthh == 3) basePrice += 500;
+      }
+
+      if (garageType == "ocynkowany") {
+        garagePrice += addLengthhPrice + addWidthPrice + basePrice;
+      }
+      basePrice += addLengthhPrice + addWidthPrice;
+
+      if (garageType == "akrylowy") {
+        var addNumberWidth = 0;
+
+        if (width == 3) basePrice += 500;
+        if (width == 4) basePrice += 600;
+        if (width == 5) basePrice += 900;
+        if (width >= 6) basePrice += 1000 + 200 * (width - 6);
+
+        tmp1haha = 100;
+        for (let tmp1 = 4; tmp1 <= lengthh; tmp1++) {
+          basePrice += tmp1haha;
+          if (tmp1 % 2 == 1) {
+            tmp1haha += 100;
+          }
+        }
+
+        tmpNumber = 400 + (width - 3) * 200;
+
+        garagePrice = basePrice;
+      }
+      if (garageType == "drewnopodobny") {
+        var addWidthPrice = 0;
+        var addLengthhPrice = 0;
+        var tmpNumber = 3231313100;
+
+        var addNumberWidth = 0;
+
+        if (width == 3) basePrice += 500 * 2;
+        if (width == 4) basePrice += 600 * 2;
+        if (width == 5) basePrice += 900 * 2;
+        if (width >= 6) basePrice += (1000 + 200 * (width - 6)) * 2;
+
+        tmp1haha = 100 * 2;
+        for (let tmp1 = 4; tmp1 <= lengthh; tmp1++) {
+          basePrice += tmp1haha;
+          if (tmp1 % 2 == 1) {
+            tmp1haha += 100 * 2;
+          }
+        }
+
+        tmpNumber = 400 + (width - 3) * 200;
+
+        garagePrice = basePrice;
+      }
+    }
+
+    if (roofPitch == "dwuspadowy") {
+      //DWUSPADOWY || DWUSPADOWY || DWUSPADOWY || DWUSPADOWY || DWUSPADOWY || DWUSPADOWY || DWUSPADOWY || DWUSPADOWY
+      var heightMiddle = parseInt(theForm.elements["height-middle"].value);
+      var heightSides = parseInt(theForm.elements["height-sides"].value);
+
+      if (heightMiddle > 1000 || heightSides > 1000 || heightGate > 200) {
+        var addHeightPrice =
+          Math.max(
+            Math.ceil((heightMiddle - 1000) / 10),
+            Math.ceil((heightSides - 1000) / 10),
+            Math.ceil((heightGate - 200) / 10)
+          ) *
+          (width - 1) *
+          100;
+        totalPrice += addHeightPrice;
+      }
+
+      basePrice = 2900;
+      var addWidthPrice = 0;
+      var addLengthhPrice = 0;
+      var tmpNumber = 300;
+      for (
+        var tmpLengthh = 4;
+        tmpLengthh <= Math.max(lengthh, width);
+        tmpLengthh++
+      ) {
+        addLengthhPrice += tmpNumber;
+        if (tmpLengthh % 2 == 1) {
+          tmpNumber += 200;
+        }
+        if (Math.min(width, lengthh) == tmpLengthh) {
+          addWidthPrice = (width - 3) * 200 * (lengthh - 3);
+          basePrice += addLengthhPrice + 500;
+        }
+      }
+      if (width > lengthh) {
+        addWidthPrice = 200 * (width - 3) * (lengthh - 3);
+        if (lengthh == 3) basePrice += 500;
+      }
+
+      if (garageType == "ocynkowany") {
+        garagePrice += addLengthhPrice + addWidthPrice + basePrice;
+      }
+      basePrice += addLengthhPrice + addWidthPrice;
+
+      if (garageType == "akrylowy") {
+        var addNumberWidth = 0;
+
+        if (width == 3) basePrice += 1000;
+        if (width == 4) basePrice += 1100;
+        if (width == 5) basePrice += 1400;
+        if (width >= 6) basePrice += 1400 + 300 * (width - 6);
+
+        tmp1haha = 100;
+        for (let tmp1 = 4; tmp1 <= lengthh; tmp1++) {
+          basePrice += tmp1haha;
+          if (tmp1 % 2 == 1) {
+            tmp1haha += 100;
+          }
+        }
+
+        tmpNumber = 400 + (width - 3) * 200;
+
+        garagePrice = basePrice;
+      }
+      if (garageType == "drewnopodobny") {
+        var addWidthPrice = 0;
+        var addLengthhPrice = 0;
+        var tmpNumber = 3231313100;
+
+        var addNumberWidth = 0;
+
+        if (width == 3) basePrice += 1000;
+        if (width == 4) basePrice += 1600;
+        if (width == 5) basePrice += 1800;
+        if (width >= 6) basePrice += 2200 + 400 * (width - 6);
+
+        tmp1haha = 100 * 2;
+        for (let tmp1 = 4; tmp1 <= lengthh; tmp1++) {
+          basePrice += tmp1haha;
+          if (tmp1 % 2 == 1) {
+            tmp1haha += 100 * 2;
+          }
+        }
+
+        tmpNumber = 400 + (width - 3) * 200;
+
+        garagePrice = basePrice;
+      }
+    }
+
+    var flashing = theForm.elements["flashing"];
+    if (embossmentType == "horizontal") {
+      flashing.checked = true;
+      document.getElementById("flashing-description").innerHTML =
+        "Obróbka blacharska (okucia) - <b style='color: red'>przy wyborze przetłoczenia poziomego, obróbka blacharska jest wymagana</b>";
+      totalPrice += Math.ceil((0.2 * garagePrice) / 100) * 100;
+    } else if (flashing.checked == true && embossmentType == "vertical") {
+      var fib1 = 500;
+      var fib2 = 800;
+      var toBeAdded = fib1;
+      for (let i = 25; i < width * lengthh; i = i * 2) {
+        toBeAdded = fib2;
+        fib2 += fib1;
+        fib1 = toBeAdded;
+      }
+      totalPrice += toBeAdded;
+      document.getElementById("flashing-description").innerHTML =
+        "Obróbka blacharska (okucia)";
+    }
+
+    var additionalDoor = theForm.elements["additional-door"];
+    var additionalDoorQuantity =
+      theForm.elements["additional-door-quantity"].value;
+    if (additionalDoor.checked == true) {
+      totalPrice += 300 * additionalDoorQuantity;
+    }
+
+    var additionalWindow = theForm.elements["additional-window"];
+    if (additionalWindow.checked == true) {
+      totalPrice += 200;
+    }
+
+    var gutter = theForm.elements["gutter"];
+    if (gutter.checked == true) {
+      totalPrice += Math.ceil((110 * width) / 100) * 100;
+    }
+
+    var antiCondensationFelt = theForm.elements["anti-condensation-felt"];
+    if (antiCondensationFelt.checked == true) {
+      totalPrice += Math.ceil((16 * width * lengthh) / 100) * 100;
+    }
+
+    var automaticGate = theForm.elements["automatic-gate"];
+    if (automaticGate.checked == true && gateType == "uao-gate") {
+      totalPrice += 1000 * gateQuantity;
+    }
+
+    if (gateType == "uao-gate") {
+      totalPrice += 700 * gateQuantity;
+    } else if (gateQuantity > 1) {
+      totalPrice += 700 * (gateQuantity - 1);
+    }
+
+    if (roofType == "steel-tile") {
+      totalPrice += Math.ceil((60 * width * lengthh) / 100) * 100;
+    }
+
+    totalPrice += garagePrice;
+
+    if (theForm.elements["gate-quantity"].value > Math.floor(width / 3)) {
+      document.getElementById("totalPrice").innerHTML =
+        "<b style='color: red'>Ilość bram nie może być większa niż " +
+        Math.floor(width / 3) +
+        ".<br>Jeżeli chcesz dodać więcej bram, zwiększ szerokość garażu.<br>Minimalna szerokość garażu dla " +
+        theForm.elements["gate-quantity"].value +
+        " bram to: " +
+        Math.ceil(theForm.elements["gate-quantity"].value * 3) +
+        " m.</b>";
+    } else if (totalPrice < 5000) {
+      document.getElementById("totalPrice").innerHTML =
+        "Cena: <b>" +
+        totalPrice +
+        " zł </b> (+ 300 zł koszt transportu i montażu)";
+    } else {
+      document.getElementById("totalPrice").innerHTML =
+        "Cena: <b>" +
+        totalPrice.toLocaleString("pl-PL", {
+          currency: "PLN",
+          style: "currency",
+        }) +
+        "</b> (transport i montaż gratis)";
+    }
+  }
+</script>
+
+<style>
+  input,
+  select,
+  p {
+    margin-top: 10px;
+  }
+  input,
+  select {
+    border-radius: 20px;
+    border: 1px solid black;
+    text-align: center;
+  }
+  input[type="number"],
+  select {
+    height: 40px;
+    font-size: 20px;
+  }
+  select {
+    width: 350px;
+  }
+  input[type="number"] {
+    width: 60px;
+  }
+  button {
+    padding: 0;
+    width: 60px;
+    height: 30px;
+  }
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  form {
+    margin: 0;
+  }
+</style>
